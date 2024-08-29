@@ -1,2 +1,140 @@
-# awesome-livetrading-backtest-libraries
-more detailed description of the popular and awesome backtesting and livetrading system in github. 对GitHub上最靓的回测和实盘交易系统一个稍微详细的描述和分析
+# 开源交易系统说明
+
+# Backtesting & Live Trading
+
+## backtrader
+
+https://github.com/backtrader/backtrader 
+
+**【Star 13.9k】【架构完整】【复杂策略】【强烈推荐】【event-driven】**
+
+自己看代码去，值得学习。因为通用性强，支持特性多，速度就一般般，尤其是当数据特别大的时候。虽然支持非常复杂的策略，但还是需要修改底层源码。同样支持实盘，用实盘做期货和数字货币毫无压力。
+
+## aat
+
+https://github.com/AsyncAlgoTrading/aat
+
+**【Star 652】【很多TODO】【架构基本完整】【可借鉴】【event-driven】**
+
+- `asyncio` 框架
+- 将主要的结构体用`C++`实现，通过`pybind11`绑定，主要结构有order, trade, position, order book,  instrument, account。逻辑实现还是在`Python`
+- 本地维护一个订单薄【应该是行情系统做的事】
+- Manager+事件分发架构。对于任何事件，依次执行`PortfolioManager.onXXX(event)`, `RiskManager.onXXX(event)`, `OrderManager.onXXX(event)`
+- PortfolioManager：和投资组合优化无关【应该叫PositionManager，头寸管理器】
+- RiskManager：TODO
+- Exchange：继承MarketData（市场行情数据）和OrderEntry（下单）两个模块。已经实现
+    - 【实盘】coinbase接口
+    - 【实盘】IB 接口
+    - 【实盘，美股市场】IEX Cloud https://iexcloud.io/
+    - 【回测】csv本地数据接口
+    - 【模拟】synthetic 合成市场，模拟订单薄
+- 整个交易系统靠Exchange.MarketData.tick(trade)驱动，这里的trade表示市场的成交，用来更新本地的订单薄，根据订单薄来下单【高频】【不支持K线驱动】
+
+# Live Trading Only
+
+## stock
+
+https://github.com/myhhub/stock
+
+**【A股】【schedule-driven】**
+
+- `cron`定时任务拉取东财、同花顺网站数据，做了一套数据展示的网站。
+- 交易引擎（改的 [easyquant](https://github.com/shidenggui/easyquant) ）就是简单的定时任务（开盘、收盘、间隔半分钟/1分钟/5分钟…触发一次），交易接口使用 [easytrader](https://github.com/shidenggui/easytrader)。
+
+## easytrader
+
+https://github.com/shidenggui/easytrader
+
+**【A股】**
+
+- 使用 [pywinauto](https://github.com/pywinauto/pywinauto) 对下单软件GUI进行识别和控制，实现无人监控自动下单。
+- 能复制`joinquant`, `ricequant`, `雪球` 的模拟盘操作到实盘。
+
+## easyquant
+
+https://github.com/shidenggui/easyquant
+
+**【A股】【event-driven】【schedule-driven】**
+
+- 交易引擎简单的定时任务+实时行情回调，交易接口使用 [easytrader](https://github.com/shidenggui/easytrader)，行情数接口使用[easyquotation](https://github.com/shidenggui/easyquotation)。
+
+# Backtesting Only
+
+## Backtesting.py
+
+**【Star 5.3k】【值得借鉴】【轻量级】【复杂策略】【schedule-driven】**
+
+https://kernc.github.io/backtesting.py/
+
+- 使用[bokeh](https://bokeh.org/) 绘图
+- 主要类：`_Data`、`_Indicator`、`Strategy`、`Order`、`Position`、`Trade`、`_Broker`、`Backtest`。只支持单一的Data。
+- 指标在Init的时候，提前算好了
+- 支持止盈止损，支持追踪止损
+- 架构类似[backtrader](#backtrader)
+- 指标优化，使用`scikit-optimize`库
+
+## bt
+
+https://github.com/pmorissette/bt
+
+**【Star 2.1k】【值得借鉴】【复杂策略】【轻量级】【schedule-driven】**
+
+- 特色：algos中所有交易都**模块化**【算法交易】。策略和证券分别用节点`Node`表示，组成树状图，每个策略维持一个algos列表，运行策略即运行该策略上的algos列表，以及递归运行其子节点上的algos列表。algos 模块有：
+    - 时间间隔任务、定时任务
+    - 选股和权重
+    - 仓位再平衡
+    - 计算风险，用于展示
+- **只支持一个价格close**
+- 可实现：买入持有每月调仓、风险平价、固定收入、统计套利、Predicted Tracking Error Rebalance、父子策略、目标波动率、技术指标等
+- 非常丰富的测试用例，单元测试和基准测试bench
+
+## vectorbt
+
+https://github.com/polakowo/vectorbt
+
+**【Star 4.1k】【轻量级】【简单策略】【vectorized】**
+
+- 数据提前加载，开平仓信号提前计算好，支持多参数（参数优化 ），然后批量回测。
+- 各种数据、数组的处理函数，指标的计算，全部使用numba加速。
+- `generic.splitters`模块机器学习数据集划分算法：`RangeSplitter`, `RollingSplitter`, `ExpandingSplitter`。
+- `labels`模块：可以给训练集打标签。
+- `portfolio`模块：提前计算好仓位，订单、信号都会影响到仓位，都要提前算好
+- `records`模块：稀疏数组
+- `signals`模块：生成开仓和平仓信号
+
+## zipline-reloaded
+
+## qlib
+
+https://github.com/microsoft/qlib
+
+**【Star 15.1k】【Microsoft出品】【AI】【重量级】【强烈推荐】【schedule-driven】**
+
+AI助力的投研平台，从最底层到上层依次讲解：
+
+- Infrastructure layer 基础设施层，包含：数据服务器，模型训练器，模型存储和管理器。
+    - 数据服务器
+        - 整个流程支持配置化
+        - 原始数据来源各种网站，提供数据HTTP下载的各种网站，数据以二进制文件形式存储在本地，供上层数据分析。qlib对每一列单独存储，本质是调用`numpy.array.tofile()` 接口保存为文件。可以参考`scripts/dump_bin.py`
+        - 额外还有一个项目[qlib-server](https://github.com/microsoft/qlib-server)，远程提供数据和缓存。使用 [Flask-SocketIO](https://flask-socketio.readthedocs.io/) 框架。
+        - XXXProvider：实现获取数据的接口。主要有两大类，Client和Local，Client是连接远程qlib-server的接口，Local是从本地文件加载的接口
+        - DataLoader：从provider中 或者 文件中 获取数据。数据主要有 **日历**，**instruments（证券信息）**，**features（特征，多列字段组合为一个特征）**。**丰富的查询接口，支持条件过滤，支持formulaic表达式（`rule_expression`）**
+        - DataHandler：数据预处理，由处理器`processors`组成
+        - Dataset：是已经处理好，可供机器学习或者推理的数据
+        - 有缓存机制，将中间结果缓存在本地文件，或者 内存。Redis用来提供分布式锁。
+    - 模型训练器
+        - 训练任务管理器，支持多进程，任务池
+        - 每次训练的结果保存为`record`，所有`record`会记录下来，用来分析模型的性能，进行调参。所有record通过`ExperimentManager`进行管理
+    - 预置了非常多机器学习模型
+- Learning Framework layer 机器学习框架 **PyTorch**
+    - 有监督学习和强化学习
+- Workflow layer 从市场数据→推理(预测)→构建投资组合(投资决策)→订单执行(回测)
+    - 回测**【复杂策略】【schedule-driven】**
+        - trade_strategy，做出投资决策`BaseTradeDecision`，买或卖。策略可以包含一个**投资组合优化器【仓位管理】，比如说指数增强策略。**
+        - trade_executor，执行决策。支持嵌套执行器和嵌套策略。比如说日内策略，外层是日策略，决定是否开仓，开仓哪些品种，内层是1分钟策略，决定每分钟买入或卖出量（TWAP）。基于预测模型的策略也叫`SignalStrategy`。内嵌策略可以理解为【**算法交易】**。
+- Interface layer 分析报告
+    - 回测结果
+        - `PortfolioMetrics` 总资产、现金、收益率、持仓市值、换手率等。可以绘制出`report_graph`、`risk_analysis_graph`等图表
+        - `Indicator` 算法交易过程中记录的一些指标，比如完成率`ffr`，基准价格`base_price`，超出基准价百分比`price advantage`等
+    - 风险模型：`RiskModel`、`POETCovEstimator`、`ShrinkCovEstimator`、`StructuredCovEstimator`
+    - 预测模型分析报告
