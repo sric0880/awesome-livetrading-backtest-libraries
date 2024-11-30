@@ -156,6 +156,17 @@ https://github.com/polakowo/vectorbt
 
 ## zipline-reloaded
 
+https://github.com/stefan-jansen/zipline-reloaded
+
+**【Star 1.2k】【完成度高】【架构完整】【强烈推荐】【schedule-driven】**
+
+代码质量很高，文档和注释非常完整。只支持Daily和Minute。文档说也支持实盘，但是并没有实盘的接口和案例。
+
+核心模块三大类：
+- 数据类，底层是用数据库和bcolz，数据格式：按fields分开，比如一个close数据是二维的ndarray，行是时间，列是assets
+- Pipeline数据处理流程类，将数据计算分为多个节点（Term）组成单向无环图，支持各种因子、指标、算法等计算
+- 交易引擎类，使用bar来驱动运行
+
 ## qlib
 
 https://github.com/microsoft/qlib
