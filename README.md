@@ -125,6 +125,16 @@ https://kernc.github.io/backtesting.py/
 - 架构类似[backtrader](#backtrader)
 - 指标优化，使用`scikit-optimize`库
 
+## OpenBacktesting
+
+https://github.com/lucidcog/openbacktesting
+
+- 基于 Python 的单资产历史回测框架，按 K 线逐步执行策略。
+- 支持技术指标、交易明细和基于 pandas 的权益与绩效统计。
+- 支持网格搜索，以及可选的 SAMBO 参数优化。
+- 当前范围是历史回测，不包含实盘执行或多资产组合账户。
+- [官方文档](https://docs.openbacktesting.com/)
+
 ## bt
 
 https://github.com/pmorissette/bt
